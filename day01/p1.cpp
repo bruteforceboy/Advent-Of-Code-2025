@@ -29,15 +29,11 @@ auto split(std::string_view str, char delim) {
 
 template <typename T>
 auto solve(T vec) -> void {
-    int start = 50;
-    int res = 0;
+    int start = 50, res = 0;
     for (auto &r : vec) {
-        char dir = r[0];
         int times = stoi(r.substr(1));
-        if (dir == 'L')
-            start = (start + times) % 100;
-        else if (dir == 'R')
-            start = (start - times + 100) % 100;
+        start =
+            (r[0] == 'R' ? (start + times) % 100 : (start - times + 100) % 100);
         res += (start == 0);
     }
     std::cout << res << "\n";

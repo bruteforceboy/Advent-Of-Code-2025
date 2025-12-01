@@ -29,21 +29,20 @@ auto split(std::string_view str, char delim) {
 
 template <typename T>
 auto solve(T vec) -> void {
-    int start = 50;
-    int res = 0;
+    int start = 50, res = 0;
     for (auto &r : vec) {
-        char dir = r[0];
         int times = stoi(r.substr(1));
-        for (int i = 0; i < times; i++) {
-            if (dir == 'L')
-                ++start;
-            else
-                --start;
-            start %= 100;
-            start += 100;
-            start %= 100;
-            res += (start == 0);
-        }
+        auto madd = [&](int delta) {
+            start =
+                (start + (r[0] == 'L' ? -delta : delta) + 100 * 1000000) % 100;
+            times -= delta;
+        };
+
+        madd(start % 100 == 0);
+        madd(
+            std::min(times, r[0] == 'L' ? (start % 100) : (100 - start) % 100));
+        res += (start % 100 == 0) + times / 100;
+        madd(times);
     }
     std::cout << res << "\n";
 }
