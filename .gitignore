@@ -1,3 +1,8 @@
 *.sh
 *.zsh
 *.bash
+*.o
+*.out
+*.exe
+*.in
+*.txt
