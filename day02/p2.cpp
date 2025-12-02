@@ -1,7 +1,8 @@
+#include <algorithm>
 #include <cassert>
 #include <iostream>
+#include <numeric>
 #include <ranges>
-#include <set>
 #include <string>
 #include <vector>
 
@@ -28,40 +29,38 @@ auto split(std::string_view str, char delim) {
     return result;
 }
 
+auto match(std::string_view s, int len) {
+    if (!len || s.length() % len)
+        return false;
+    auto target = s.substr(0, len);
+    for (int i = len; i < s.length(); i += len)
+        if (s.substr(i, len) != target)
+            return false;
+    return true;
+}
+
 template <typename T>
 auto solve(T vec) -> void {
     long long result = 0;
+
     for (auto &r : vec) {
         auto splitted = split<std::string>(r, ',');
         for (auto &str : splitted) {
-            long long l = stoll(str.substr(0, str.find('-')));
-            long long r = stoll(str.substr(str.find('-') + 1));
-            for (long long i = l; i <= r; i++) {
-                std::string i_str = std::to_string(i);
-                int n = i_str.length();
-                bool can = false;
-                for (int i = 1; i < n; i++) {
-                    if (n % i == 0) {
-                        bool ok = true;
-                        std::set<std::string> st;
-                        for (int j = 0; j < n; j += i) {
-                            st.emplace(i_str.substr(j, i));
-                            if (st.size() > 1) {
-                                ok = false;
-                                break;
-                            }
-                        }
-                        if (ok) {
-                            can = true;
-                            break;
-                        }
-                    }
-                }
-                if (can)
-                    result += i;
+            auto l = stoll(str.substr(0, str.find('-')));
+            auto r = stoll(str.substr(str.find('-') + 1));
+            for (auto i = l; i <= r; ++i) {
+                std::string str = std::to_string(i);
+
+                std::vector lens(str.length(), 0);
+                std::iota(begin(lens), end(lens), 0);
+                result += std::any_of(std::begin(lens), std::end(lens),
+                                      [&](int len) { return match(str, len); })
+                              ? i
+                              : 0;
             }
         }
     }
+
     std::cout << result << std::endl;
 }
 
