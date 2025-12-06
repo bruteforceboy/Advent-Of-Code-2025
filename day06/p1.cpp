@@ -14,9 +14,10 @@ auto split(std::string_view str, char delim) {
                 result.push_back(stoll(str));
             else if constexpr (std::is_floating_point<T>::value)
                 result.push_back(stold(str));
-            else if constexpr (std::is_same_v<T, std::string>)
-                result.emplace_back(str);
-            else if constexpr (std::is_same_v<T, std::string_view>)
+            else if constexpr (std::is_same_v<T, std::string>) {
+                if (!str.empty())
+                    result.emplace_back(str);
+            } else if constexpr (std::is_same_v<T, std::string_view>)
                 result.emplace_back(str);
             else
                 static_assert(false, "split<T>: wyd blud");
@@ -31,23 +32,8 @@ template <typename T>
 auto solve(T vec) -> void {
     std::vector<std::vector<std::string>> rows;
 
-    for (auto &r : vec) {
-        std::vector<std::string> nums;
-        std::string cur;
-        for (auto &ch : r) {
-            if (ch == ' ') {
-                if (!cur.empty())
-                    nums.emplace_back(cur);
-                cur.clear();
-            } else {
-                cur += ch;
-            }
-        }
-        if (!cur.empty())
-            nums.emplace_back(cur);
-
-        rows.emplace_back(nums);
-    }
+    for (auto &r : vec)
+        rows.emplace_back(split<std::string>(r, ' '));
 
     int n = rows.size(), m = rows[0].size();
     long long result = 0;
